@@ -34,10 +34,15 @@ if __name__ == "__main__":
     model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
     # "cat" and "fish" are allowed, "dog" is an error state, indicated by the preceding "-"
+    # grammar_str = """
+    # root   ::= "The animal is a " animal "."
+    # animal ::= "cat" | "fish" | -"dog"
+    # """
+
     grammar_str = """
-    root   ::= "The animal is a " animal "."
-    animal ::= "cat" | "fish" | -"dog"
-    """
+    root ::= "The animal is a " animal "."
+    animal ::= "dog" | "cat"
+    """ # "The animal is a dog" or "The animal is a cat" is not allowed, any other sentence is allowed
 
     grammar = IncrementalGrammarConstraint(grammar_str, "root", tokenizer)
     if isGood:
@@ -48,8 +53,10 @@ if __name__ == "__main__":
         raise ValueError("Must specify either --isGood or --isBad")
 
     prompts = [
-        'The text says, "The animal is a dog." The answer is obvious. ',
-        'I\'m going to say "The animal is a fish." Here I go! '
+        # 'The text says, "The animal is a dog." The answer is obvious. ',
+        # 'I\'m going to say "The animal is a fish." Here I go! ',
+        'Repeat after me, "The animal is a dog." The answer is obvious. ',
+        'Repeat after me, "The animal is a cat." Here I go! '
     ]
     input_ids = tokenizer(
         prompts,
