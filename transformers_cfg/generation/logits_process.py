@@ -270,14 +270,13 @@ class GrammarConstrainedLogitsProcessor(LogitsProcessor):
             self.grammar_constraint.reset()
 
 
+"""
 # --------------------------------------------------------------------------- #
 # -- Custom LogitsProcessor that *blocks* tokens leading to an error state -- #
 # --------------------------------------------------------------------------- #
 class BlockBadStateLogitsProcessor(LogitsProcessor):
-    r"""
-    Masks any token whose acceptance would leave **all** surviving Earley
-    stacks with a next symbol that starts with the prefix "-".
-    """
+    # Masks any token whose acceptance would leave **all** surviving Earley
+    # stacks with a next symbol that starts with the prefix "-".
 
     def __init__(
         self,
@@ -292,23 +291,21 @@ class BlockBadStateLogitsProcessor(LogitsProcessor):
         self.id_symbol = {v: k for k, v in self.constraint.parsed_grammar.symbol_table.items()} # not implemented correctly
 
     
-    """
-    _all_stacks_bad function is not implemented correctly and is causing an error
-    Ignoring (not calling) the function for now
+    # _all_stacks_bad function is not implemented correctly and is causing an error
+    # Ignoring (not calling) the function for now
 
-    Error details:
-    'state' refers to where the parser is in the grammar, such as:
-    Grammar Rules:
-    <0>root ::= <2>[T-T] <5>[h-h] <8>[e-e] <11>[ - ] <14>[a-a] <17>[n-n] <20>[i-i] <23>[m-m] <26>[a-a] <29>[l-l] <32>[ - ] <35>[i-i] <38>[s-s] <41>[ - ] <44>[a-a] <47>[ - ] <50>animal <52>[.-.] 
-    <57>animal ::= <59>[c-c] <62>[a-a] <65>[t-t] | <70>[f-f] <73>[i-i] <76>[s-s] <79>[h-h] | <84>[d-d] <87>[o-o] <90>[g-g] 
+    # Error details:
+    # 'state' refers to where the parser is in the grammar, such as:
+    # Grammar Rules:
+    # <0>root ::= <2>[T-T] <5>[h-h] <8>[e-e] <11>[ - ] <14>[a-a] <17>[n-n] <20>[i-i] <23>[m-m] <26>[a-a] <29>[l-l] <32>[ - ] <35>[i-i] <38>[s-s] <41>[ - ] <44>[a-a] <47>[ - ] <50>animal <52>[.-.] 
+    # <57>animal ::= <59>[c-c] <62>[a-a] <65>[t-t] | <70>[f-f] <73>[i-i] <76>[s-s] <79>[h-h] | <84>[d-d] <87>[o-o] <90>[g-g] 
     
-    However, 'id_symbol' is implemented as a dictionary, such as:
-    {0: 'root', 1: 'animal'}
-    Hence, KeyError arises since id_symbol is not able to map the state to the correct symbol
-    """
+    # However, 'id_symbol' is implemented as a dictionary, such as:
+    # {0: 'root', 1: 'animal'}
+    # Hence, KeyError arises since id_symbol is not able to map the state to the correct symbol
 
     def _all_stacks_bad(self, state) -> bool:
-        """Return True iff *every* surviving Earley stack expects an 'E*' symbol."""
+        # Return True iff *every* surviving Earley stack expects an 'E*' symbol.
         
         logger.debug("id_symbol: \n" + pprint.pformat(self.id_symbol))
         for stack in state.stacks:
@@ -322,7 +319,7 @@ class BlockBadStateLogitsProcessor(LogitsProcessor):
 
     # Quick hack to check if a token is bad, similar to BadWordLogitsProcessor
     def _this_token_bad(self, tok_id: int) -> bool:
-        """Return True iff the token ID is a bad token."""
+        # Return True iff the token ID is a bad token.
 
         # TODO: instead of hard-coded bad_word, should connect bad_words to the parsed grammar
         bad_words = ["dog"]
@@ -419,11 +416,10 @@ class BlockBadStateLogitsProcessor(LogitsProcessor):
     def process_logits(
         self, input_ids: torch.LongTensor, scores: torch.FloatTensor
     ) -> torch.FloatTensor:
-        """
-        :param input_ids:
-        :param scores:
-        :return:
-        """
+        
+        # :param input_ids:
+        # :param scores:
+        # :return:
 
         # same as above
         if self.device is None:
@@ -478,3 +474,4 @@ class BlockBadStateLogitsProcessor(LogitsProcessor):
     def reset(self):
         self.batch_parsing_states = None
         self.constraint.reset()
+"""

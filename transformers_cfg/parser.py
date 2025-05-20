@@ -195,14 +195,13 @@ def generate_symbol_id(state: ParseState, base_name: str) -> int:
     return next_id
 
 
-# Changed: no longer allowing "-", since that is used to indicate error state
 def is_word_char(c: str) -> bool:
     """
-    Check if a char is  a-z, A-Z, 0-9, _, i.e., chars allowed as rule names
+    Check if a char is  a-z, A-Z, 0-9, -, _, i.e., chars allowed as rule names
     Returns:
 
     """
-    return c.isalnum() or c == "_"
+    return c.isalnum() or c == "-" or c == "_"
 
 
 def hex_to_int(c: str) -> int:
@@ -411,6 +410,7 @@ def _parse_rhs_symbol_reference(
     return remaining_src
 
 
+"""
 def _parse_rhs_error_state(
     src: str, state: ParseState, rule_name: str, alternative: AlternativeElements # may add or remove some args
 ) -> str:
@@ -427,6 +427,7 @@ def _parse_rhs_error_state(
     # alternative.add_element(ReferenceElement(synthetic_rule_id))      # output reference to synthesized rule
 
     return remaining_src
+"""
 
 
 def _parse_rhs_grouping(
@@ -560,11 +561,11 @@ def parse_simple_rhs(
             remaining_rhs = _parse_rhs_symbol_reference(
                 remaining_rhs, state, alternative
             )
-        elif remaining_rhs[0] == "-":
-            # our error state
-            remaining_rhs = _parse_rhs_error_state(
-                remaining_rhs, state, rule_name, alternative
-            )
+        # elif remaining_rhs[0] == "-":
+        #     # our error state
+        #     remaining_rhs = _parse_rhs_error_state(
+        #         remaining_rhs, state, rule_name, alternative
+        #     )
         elif remaining_rhs[0] == "(":
             # grouping
             remaining_rhs = _parse_rhs_grouping(
