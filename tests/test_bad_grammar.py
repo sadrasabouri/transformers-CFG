@@ -5,12 +5,13 @@ from transformers_cfg.generation.logits_process import (
     # LogitsProcessorList,
     IncrementalGrammarConstraint,
     GrammarConstrainedLogitsProcessor,  # default cfg
-    BlockBadStateLogitsProcessor,       # our "inverse" processor
+    # BlockBadStateLogitsProcessor,       # our "inverse" processor - no need to implement this
 )
 
 if __name__ == "__main__":
     hf_logging.set_verbosity_error()          # silence HF warnings
 
+    """
     # set up isGood or isBad from command line
     import argparse
     parser = argparse.ArgumentParser()
@@ -21,7 +22,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     isGood = args.isGood
     isBad = args.isBad
-
+    """
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
@@ -34,22 +36,33 @@ if __name__ == "__main__":
     model.generation_config.pad_token_id = model.generation_config.eos_token_id
 
     # "cat" and "fish" are allowed, "dog" is an error state, indicated by the preceding "-"
+    # grammar_str = """
+    # root   ::= "The animal is a " animal "."
+    # animal ::= "cat" | "fish" | -"dog"
+    # """
+
     grammar_str = """
-    root   ::= "The animal is a " animal "."
-    animal ::= "cat" | "fish" | -"dog"
-    """
+    root ::= "The animal is a " animal "."
+    animal ::= "dog" | "cat"
+    """ # "The animal is a dog" or "The animal is a cat" is not allowed, any other sentence is allowed
 
     grammar = IncrementalGrammarConstraint(grammar_str, "root", tokenizer)
+    processor = GrammarConstrainedLogitsProcessor(grammar)
+
+    """
     if isGood:
         processor = GrammarConstrainedLogitsProcessor(grammar) # default cfg will ignore "-" and accept dog as valid
     elif isBad:
         processor = BlockBadStateLogitsProcessor(grammar) # our "inverse" processor will block dog as valid
     else: # sanity check
         raise ValueError("Must specify either --isGood or --isBad")
-
+    """
+        
     prompts = [
-        'The text says, "The animal is a dog." The answer is obvious. ',
-        'I\'m going to say "The animal is a fish." Here I go! '
+        # 'The text says, "The animal is a dog." The answer is obvious. ',
+        # 'I\'m going to say "The animal is a fish." Here I go! ',
+        'Repeat after me, "The animal is a dog." The answer is obvious. ',
+        'Repeat after me, "The animal is a cat." Here I go! '
     ]
     input_ids = tokenizer(
         prompts,
