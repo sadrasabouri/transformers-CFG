@@ -60,6 +60,7 @@ class ByteTrie:
         valid_byte_seqs: List[Tuple[List[int], int]] = []
         counter = {"visited": 0, "pruned": 0}
 
+        # NOTE: the BFS only returns byte sequences which are accepted by the predicate
         while queue:
             counter["visited"] += 1
             node, byte_seq = queue.popleft()
@@ -76,7 +77,7 @@ class ByteTrie:
 
     def get_next_token_acceptance(
         self, accept=lambda x: True, accept_eos=True, eos_token_id=None
-    ) -> List[bool]:
+    ) -> List[bool]: # NOTE: and this function return accepted tokens based on the `accept` criteria
         valid_byte_seqs: List[Tuple[List[int], int]] = self.bfs(accept, verbose=True)
         valid_token_ids: List[int] = [token_id for _, token_id in valid_byte_seqs]
         token_acceptance: List[bool] = [False] * (len(self))
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     trie = ByteTrie.from_tokenizer(tokenizer)
     print(f"length of trie: {len(trie)}=={len(tokenizer.vocab.items())}")
 
-    trie.visualize(max_depth=0)
+    trie.visualize(max_depth=2)
 
     #
     # print(trie.search("hello"))  # Example, replace with actual words from the vocab
@@ -124,11 +125,11 @@ if __name__ == "__main__":
     # for word in words:
     #     print(bytes(word[0]).decode("utf-8"))
     #
-    # # Example Usage
-    # words = trie.bfs(predicate=lambda x: len(x) > 0 and x[0] == 65 or len(x)==0)
-    # for word in words:
-    #     print(bytes(word[0]).decode("utf-8"))
-    #
+    # Example Usage
+    words = trie.bfs(predicate=lambda x: len(x) > 0 and x[0] == 68 or len(x)==0)
+    for word in words:
+        print(bytes(word[0]).decode("utf-8"))
+    
     # token_acceptance = trie.get_next_token_acceptance(accept=lambda x: len(x) > 0 and x[0] == 65 or len(x)==0)
     # print(sum(token_acceptance))
     # assert sum(token_acceptance) == len(words)
